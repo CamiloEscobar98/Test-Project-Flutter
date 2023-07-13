@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:test_project_flutter/constants/routes.dart';
 import 'package:test_project_flutter/models/user.dart';
 import 'package:test_project_flutter/services/user_service.dart';
 
@@ -95,7 +96,10 @@ class _UserListScreenState extends State<UserListScreen> {
                           Icons.delete,
                           color: Colors.red,
                         )),
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.pushReplacementNamed(context, USER_INFO_SCREEN,
+                          arguments: user);
+                    },
                   );
                 },
               ),
