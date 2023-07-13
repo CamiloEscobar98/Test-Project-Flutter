@@ -15,10 +15,10 @@ class _UserListScreenState extends State<UserListScreen> {
 
   @override
   void initState() {
-    super.initState();
     _userService = UserService();
     _initializeDatabase();
     _loadUserList();
+    super.initState();
   }
 
   Future<void> _initializeDatabase() async {

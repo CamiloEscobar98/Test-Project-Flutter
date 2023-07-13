@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-// import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+import 'package:intl/intl.dart';
+import 'package:test_project_flutter/components/alert_message.dart';
+import 'package:test_project_flutter/constants/exports.dart';
+import 'package:test_project_flutter/models/user.dart';
 import 'package:test_project_flutter/services/user_service.dart';
 
 class UserCreateScreen extends StatefulWidget {
@@ -12,15 +15,21 @@ class UserCreateScreen extends StatefulWidget {
 class _UserCreateScreenState extends State<UserCreateScreen> {
   final _formKey = GlobalKey<FormState>();
   late UserService _userService;
+  late bool _alertMessageState;
 
-  String _fullname = '';
-  String _date = '';
+  TextEditingController fullnameInput = TextEditingController();
+  TextEditingController emailInput = TextEditingController();
+  TextEditingController dateInput = TextEditingController();
 
   @override
   void initState() {
-    super.initState();
     _userService = UserService();
     _initializeDatabase();
+    fullnameInput.text = '';
+    emailInput.text = '';
+    dateInput.text = '';
+    _alertMessageState = false;
+    super.initState();
   }
 
   Future<void> _initializeDatabase() async {
@@ -34,72 +43,163 @@ class _UserCreateScreenState extends State<UserCreateScreen> {
         title: const Text('Create User'),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            RichText(
-                text: const TextSpan(
-                  text: 'Create a New User',
-                  style: TextStyle(
-                      color: Colors.blue,
-                      fontSize: 25,
-                      fontWeight: FontWeight.bold),
+        padding: const EdgeInsets.all(20.0),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              RichText(
+                  text: const TextSpan(
+                    text: 'Create a New User',
+                    style: TextStyle(
+                        color: Colors.blue,
+                        fontSize: 25,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  textAlign: TextAlign.start),
+              const SizedBox(height: 10),
+              buildForm(context),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: Stack(
+                  children: <Widget>[
+                    Positioned.fill(
+                      child: Container(
+                        decoration: const BoxDecoration(
+                            gradient: LinearGradient(colors: <Color>[
+                          Colors.blue,
+                          Colors.lightBlue
+                        ])),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 100,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pushReplacementNamed(
+                              context, USER_LIST_SCREEN);
+                        },
+                        child: const Row(
+                          children: [Icon(Icons.arrow_back), Text('Return')],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                textAlign: TextAlign.start),
-            const SizedBox(
-              height: 10,
-            ),
-            Form(
-              key: _formKey,
-              child: Column(
-                children: <Widget>[
-                  TextFormField(
-                    decoration: const InputDecoration(labelText: 'Name'),
-                    keyboardType: TextInputType.name,
-                    controller: TextEditingController(text: _fullname),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please, type your name';
-                      }
-                      return null;
-                    },
-                    onSaved: (value) {
-                      _fullname = value!;
-                    },
-                  ),
-                  const SizedBox(height: 50),
-                  TextFormField(
-                    decoration: const InputDecoration(labelText: 'Date'),
-                    keyboardType: TextInputType.datetime,
-                    controller: TextEditingController(text: _date),
-                    readOnly: true,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please, type your birthdate';
-                      }
-                      return null;
-                    },
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      // DatePicker.showDatePicker(
-                      //   context,
-                      //   showTitleActions: true,
-                      //   onConfirm: (date) {
-                      //     setState(() {
-                      //       _date = date.toString();
-                      //     });
-                      //   },
-                      // );
-                    },
-                    child: const Text('Select Birthdate'),
-                  )
-                ],
               ),
-            )
-          ],
+            ],
+          ),
         ),
+      ),
+    );
+  }
+
+  Widget buildForm(BuildContext context) {
+    return Form(
+      key: _formKey,
+      child: Column(
+        children: <Widget>[
+          TextFormField(
+            decoration: const InputDecoration(labelText: 'Name'),
+            keyboardType: TextInputType.name,
+            controller: fullnameInput,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please, type your name';
+              }
+              return null;
+            },
+            onSaved: (value) {
+              fullnameInput.text = value!;
+            },
+          ),
+          const SizedBox(height: 50),
+          TextFormField(
+            decoration: const InputDecoration(labelText: 'Email'),
+            keyboardType: TextInputType.emailAddress,
+            controller: emailInput,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please, type your email';
+              }
+              return null;
+            },
+            onSaved: (value) {
+              emailInput.text = value!;
+            },
+          ),
+          const SizedBox(height: 50),
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: TextFormField(
+                  decoration: const InputDecoration(labelText: 'Date'),
+                  keyboardType: TextInputType.datetime,
+                  controller: dateInput,
+                  readOnly: true,
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  DateTime? pickedDate = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(1950),
+                      lastDate: DateTime(2100));
+
+                  if (pickedDate != null) {
+                    String formattedDate =
+                        DateFormat('dd-MM-yyyy').format(pickedDate);
+
+                    setState(() {
+                      dateInput.text = formattedDate;
+                    });
+                  }
+                },
+                child: const Icon(Icons.calendar_month),
+              )
+            ],
+          ),
+          const SizedBox(height: 50),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              SizedBox(
+                width: 100,
+                child: ElevatedButton(
+                  onPressed: () async {
+                    if (_formKey.currentState!.validate()) {
+                      print('okkk');
+                      try {
+                        await _userService.addUser(User(
+                            name: fullnameInput.text,
+                            email: emailInput.text,
+                            date: dateInput.text));
+                        setState(() {
+                          _alertMessageState = true;
+                          fullnameInput.clear();
+                          emailInput.clear();
+                          dateInput.clear();
+                        });
+                      } catch (e) {
+                        setState(() {
+                          _alertMessageState = false;
+                        });
+                      }
+                    }
+                  },
+                  child: const Row(
+                    children: [Icon(Icons.save), Text('Save')],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 30),
+          _alertMessageState
+              ? const AlertMessage(message: 'Success!', icon: Icons.check)
+              : const SizedBox()
+        ],
       ),
     );
   }
