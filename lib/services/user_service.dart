@@ -8,12 +8,15 @@ import 'package:path/path.dart';
 class UserService {
   Future<Database> initDatabase() async {
     final databasePath = await getDatabasesPath();
-    final path = join(databasePath, 'example_database.db');
+    final path = join(databasePath, 'database_example.db');
     final dbExists = await databaseExists(path);
     final Database db;
     db = await openDatabase(path, version: 1, onCreate: (db, version) {
       db.execute(
-        'CREATE TABLE users(id INTEGER PRIMARY KEY, name VARCHAR, email VARCHAR, date VARCHAR)',
+        'CREATE TABLE users (id INTEGER PRIMARY KEY, name VARCHAR, email VARCHAR, date VARCHAR)',
+      );
+      db.execute(
+        'CREATE TABLE user_address (id INTEGER PRIMARY KEY, user_id INT, address VARCHAR, neighborhood VARCHAR)',
       );
     });
     return db;
@@ -44,7 +47,7 @@ class UserService {
 
   Future<Database> _getDatabase() async {
     final databasePath = await getDatabasesPath();
-    final path = join(databasePath, 'example_database.db');
+    final path = join(databasePath, 'database_example.db');
     final database = await openDatabase(path);
     return database;
   }
