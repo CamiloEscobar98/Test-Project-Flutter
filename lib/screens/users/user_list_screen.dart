@@ -86,6 +86,16 @@ class _UserListScreenState extends State<UserListScreen> {
                   final user = _userList[index];
                   return ListTile(
                     title: Text(user.name),
+                    trailing: IconButton(
+                        onPressed: () {
+
+                          print(user.toMap());
+                        },
+                        icon: const Icon(
+                          Icons.delete,
+                          color: Colors.red,
+                        )),
+                    onTap: () {},
                   );
                 },
               ),

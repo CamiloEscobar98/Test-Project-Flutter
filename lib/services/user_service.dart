@@ -22,8 +22,6 @@ class UserService {
 
       db = await openDatabase(path);
     }
-    final result = await db.query('users');
-    print('Usuarios: $result');
     return db;
   }
 

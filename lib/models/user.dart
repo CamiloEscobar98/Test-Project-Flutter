@@ -4,14 +4,19 @@ class User {
   final String email;
   final String date;
 
-  User({required this.name, required this.email, required this.date});
+  User({this.id, required this.name, required this.email, required this.date});
+
+  void setId(int id) {
+    this.id = id;
+  }
 
   Map<String, dynamic> toMap() {
-    return {'name': name, 'email': email, 'date': date};
+    return {'id': id, 'name': name, 'email': email, 'date': date};
   }
 
   User.fromMap(Map<String, dynamic> map)
-      : name = map['name'],
+      : id = map['id'],
+        name = map['name'],
         email = map['email'],
         date = map['date'];
 }
