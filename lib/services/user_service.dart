@@ -6,13 +6,16 @@ class UserService {
   Future<Database> initDatabase() async {
     final databasePath = await getDatabasesPath();
     final path = join(databasePath, 'database.db');
-    final database =
-        await openDatabase(path, version: 1, onCreate: (db, version) {
-      return db.execute(
-        'CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY, name TEXT)',
-      );
-    });
-    return database;
+    final dbExists = await databaseExists(path);
+    if (!dbExists) {
+      return await openDatabase(path, version: 1, onCreate: (db, version) {
+        return db.execute(
+          'CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY, name TEXT)',
+        );
+      });
+    } else {
+      return await openDatabase(path);
+    }
   }
 
   Future<List<User>> getAllUsers() async {

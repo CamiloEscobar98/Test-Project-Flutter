@@ -69,9 +69,12 @@ class _UserListScreenState extends State<UserListScreen> {
                   TextButton(
                       style: TextButton.styleFrom(
                           foregroundColor: Colors.white,
-                          padding: const EdgeInsets.only(left: 10.0, right: 10.0),
+                          padding:
+                              const EdgeInsets.only(left: 10.0, right: 10.0),
                           textStyle: const TextStyle(fontSize: 12)),
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, 'users/create');
+                      },
                       child: const Text('Register'))
                 ],
               ),

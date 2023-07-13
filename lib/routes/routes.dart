@@ -5,8 +5,10 @@ import 'package:test_project_flutter/constants/exports.dart';
 class RouterApplication {
   Route generateRoute(RouteSettings settings) {
     switch (settings.name) {
-      case USER_SCREEN:
+      case USER_LIST_SCREEN:
         return MaterialPageRoute(builder: (_) => const UserListScreen());
+      case USER_CREATE_SCREEN:
+        return MaterialPageRoute(builder: (_) => const UserCreateScreen());
       default:
         return MaterialPageRoute(builder: (_) => const UserListScreen());
     }
