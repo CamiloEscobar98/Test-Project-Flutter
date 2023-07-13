@@ -46,7 +46,7 @@ class UserService {
 
   Future<int> deleteUser(int id) async {
     final database = await _getDatabase();
-    return await database.delete('users', where: 'email = ?', whereArgs: [id]);
+    return await database.delete('users', where: 'id = ?', whereArgs: [id]);
   }
 
   Future<Database> _getDatabase() async {

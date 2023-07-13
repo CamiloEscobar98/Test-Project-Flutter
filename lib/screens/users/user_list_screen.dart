@@ -12,6 +12,7 @@ class UserListScreen extends StatefulWidget {
 class _UserListScreenState extends State<UserListScreen> {
   late UserService _userService;
   List<User> _userList = [];
+  bool _isShown = true;
 
   @override
   void initState() {
@@ -87,10 +88,9 @@ class _UserListScreenState extends State<UserListScreen> {
                   return ListTile(
                     title: Text(user.name),
                     trailing: IconButton(
-                        onPressed: () {
-
-                          print(user.toMap());
-                        },
+                        onPressed: _isShown == true
+                            ? () => _delete(context, user)
+                            : null,
                         icon: const Icon(
                           Icons.delete,
                           color: Colors.red,
@@ -104,5 +104,40 @@ class _UserListScreenState extends State<UserListScreen> {
         ),
       ),
     );
+  }
+
+  void _delete(BuildContext context, User user) {
+    showDialog(
+        context: context,
+        builder: (BuildContext ctx) {
+          return AlertDialog(
+            title: const Text('Please Confirm'),
+            content: const Text('Are you sure to remove the User?'),
+            actions: [
+              // The "Yes" button
+              TextButton(
+                  onPressed: () {
+                    // Remove the box
+                    _userService.deleteUser(user.id!);
+
+                    setState(() {
+                      _isShown = false;
+                    });
+
+                    _loadUserList();
+
+                    // Close the dialog
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Yes')),
+              TextButton(
+                  onPressed: () {
+                    // Close the dialog
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('No'))
+            ],
+          );
+        });
   }
 }
